@@ -1,0 +1,18 @@
+{
+  "experiment_name": "quick_test",
+  "config": {
+    "description": "Quick test run (100 steps)",
+    "max_steps": 100,
+    "bits": 4,
+    "quant_type": "nf4",
+    "double_quant": true,
+    "lora_r": 64,
+    "lora_alpha": 16,
+    "save_steps": 50
+  },
+  "model_name": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "model_size": "tiny",
+  "output_dir": "./output/original_quick_test",
+  "max_samples": 500,
+  "start_time": "2025-12-17T12:44:14.807189"
+}

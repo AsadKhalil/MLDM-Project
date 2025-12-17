@@ -1,5 +1,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+#
+# FIXED VERSION - Compatible with newer transformers
 
 from collections import defaultdict
 import copy
@@ -59,6 +61,7 @@ def is_ipex_available():
     torch_major_and_minor = get_major_and_minor_from_version(_torch_version)
     ipex_major_and_minor = get_major_and_minor_from_version(_ipex_version)
     if torch_major_and_minor != ipex_major_and_minor:
+        import warnings
         warnings.warn(
             f"Intel Extension for PyTorch {ipex_major_and_minor} needs to work with PyTorch {ipex_major_and_minor}.*,"
             f" but PyTorch {_torch_version} is found. Please switch to the matching version and run again."
@@ -287,7 +290,10 @@ class SavePeftModelCallback(transformers.TrainerCallback):
         self.save_model(args, state, kwargs)
 
 def get_accelerate_model(args, checkpoint_dir):
-
+    """
+    FIXED: Load model with proper quantization config for newer transformers.
+    """
+    n_gpus = 1
     if torch.cuda.is_available():
         n_gpus = torch.cuda.device_count()
     if is_ipex_available() and torch.xpu.is_available():
@@ -309,7 +315,7 @@ def get_accelerate_model(args, checkpoint_dir):
     print(f'loading base model {args.model_name_or_path}...')
     compute_dtype = (torch.float16 if args.fp16 else (torch.bfloat16 if args.bf16 else torch.float32))
     
-    # Create quantization config (don't pass load_in_4bit/8bit separately - causes error in newer transformers)
+    # FIX: Create quantization config - don't pass load_in_4bit/8bit separately to from_pretrained
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=args.bits == 4,
         load_in_8bit=args.bits == 8,
@@ -320,15 +326,18 @@ def get_accelerate_model(args, checkpoint_dir):
         bnb_4bit_quant_type=args.quant_type,
     )
     
+    # FIX: Only pass quantization_config, NOT load_in_4bit/load_in_8bit separately
     model = AutoModelForCausalLM.from_pretrained(
         args.model_name_or_path,
         cache_dir=args.cache_dir,
         device_map=device_map,
         max_memory=max_memory,
-        quantization_config=bnb_config,
-        torch_dtype=(torch.float32 if args.fp16 else (torch.bfloat16 if args.bf16 else torch.float32)),
+        quantization_config=bnb_config,  # This contains load_in_4bit/8bit settings
+        # REMOVED: load_in_4bit and load_in_8bit kwargs - causes error in newer transformers
+        torch_dtype=compute_dtype,
         trust_remote_code=args.trust_remote_code,
     )
+    
     if compute_dtype == torch.float16 and args.bits == 4:
         if torch.cuda.is_bf16_supported():
             print('='*80)
@@ -342,7 +351,7 @@ def get_accelerate_model(args, checkpoint_dir):
     setattr(model, 'model_parallel', True)
     setattr(model, 'is_parallelizable', True)
 
-    model.config.torch_dtype=(torch.float32 if args.fp16 else (torch.bfloat16 if args.bf16 else torch.float32))
+    model.config.torch_dtype = compute_dtype
 
     # Tokenizer
     tokenizer = AutoTokenizer.from_pretrained(
@@ -350,9 +359,8 @@ def get_accelerate_model(args, checkpoint_dir):
         cache_dir=args.cache_dir,
         padding_side="right",
         use_fast=False, # Fast tokenizer giving issues.
-        tokenizer_type='llama' if 'llama' in args.model_name_or_path else None, # Needed for HF name change
+        tokenizer_type='llama' if 'llama' in args.model_name_or_path.lower() else None,
         trust_remote_code=args.trust_remote_code,
-        use_auth_token=args.use_auth_token,
     )
     if tokenizer._pad_token is None:
         smart_tokenizer_and_embedding_resize(
@@ -360,7 +368,7 @@ def get_accelerate_model(args, checkpoint_dir):
             tokenizer=tokenizer,
             model=model,
         )
-    if 'llama' in args.model_name_or_path or isinstance(tokenizer, LlamaTokenizer):
+    if 'llama' in args.model_name_or_path.lower() or isinstance(tokenizer, LlamaTokenizer):
         # LLaMA tokenizer may not have correct special tokens set.
         # Check and add them if missing to prevent them from being parsed into different tokens.
         # Note that these are present in the vocabulary.

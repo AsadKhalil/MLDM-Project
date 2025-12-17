@@ -1,0 +1,145 @@
+{
+  "timestamp": "2025-12-17T12:40:59.429147",
+  "our_implementation": {
+    "baseline_nf4": {
+      "implementation": "ours",
+      "config": {
+        "description": "Baseline: 4-bit NF4 with Double Quantization",
+        "bits": 4,
+        "quant_type": "nf4",
+        "double_quant": true,
+        "lora_r": 64,
+        "lora_alpha": 16
+      },
+      "mean_quantization_error": 0.0730288823445638,
+      "avg_quantize_time_ms": 261.8858814239502,
+      "avg_dequantize_time_ms": 19.89428202311198,
+      "memory_stats": {
+        "fp32_memory_gb": 28.0,
+        "fp16_memory_gb": 14.0,
+        "quantized_memory_gb": 3.17625,
+        "lora_memory_gb": 25.6,
+        "total_qlora_memory_gb": 28.77625,
+        "savings_vs_fp32": -2.7723214285714226,
+        "savings_vs_fp16": -105.54464285714285
+      }
+    },
+    "comparison_fp4": {
+      "implementation": "ours",
+      "config": {
+        "description": "Comparison: 4-bit FP4 with Double Quantization",
+        "bits": 4,
+        "quant_type": "fp4",
+        "double_quant": true,
+        "lora_r": 64,
+        "lora_alpha": 16
+      },
+      "mean_quantization_error": 0.0730288823445638,
+      "avg_quantize_time_ms": 206.09203974405924,
+      "avg_dequantize_time_ms": 19.31460698445638,
+      "memory_stats": {
+        "fp32_memory_gb": 28.0,
+        "fp16_memory_gb": 14.0,
+        "quantized_memory_gb": 3.17625,
+        "lora_memory_gb": 25.6,
+        "total_qlora_memory_gb": 28.77625,
+        "savings_vs_fp32": -2.7723214285714226,
+        "savings_vs_fp16": -105.54464285714285
+      }
+    },
+    "no_double_quant": {
+      "implementation": "ours",
+      "config": {
+        "description": "Ablation: NF4 without Double Quantization",
+        "bits": 4,
+        "quant_type": "nf4",
+        "double_quant": false,
+        "lora_r": 64,
+        "lora_alpha": 16
+      },
+      "mean_quantization_error": 0.11249394714832306,
+      "avg_quantize_time_ms": 204.06977335611978,
+      "avg_dequantize_time_ms": 18.55770746866862,
+      "memory_stats": {
+        "fp32_memory_gb": 28.0,
+        "fp16_memory_gb": 14.0,
+        "quantized_memory_gb": 3.5,
+        "lora_memory_gb": 25.6,
+        "total_qlora_memory_gb": 29.1,
+        "savings_vs_fp32": -3.928571428571437,
+        "savings_vs_fp16": -107.85714285714288
+      }
+    },
+    "low_rank": {
+      "implementation": "ours",
+      "config": {
+        "description": "Ablation: Lower LoRA Rank (r=16)",
+        "bits": 4,
+        "quant_type": "nf4",
+        "double_quant": true,
+        "lora_r": 16,
+        "lora_alpha": 16
+      },
+      "mean_quantization_error": 0.0730288823445638,
+      "avg_quantize_time_ms": 205.34578959147134,
+      "avg_dequantize_time_ms": 19.84564463297526,
+      "memory_stats": {
+        "fp32_memory_gb": 28.0,
+        "fp16_memory_gb": 14.0,
+        "quantized_memory_gb": 3.17625,
+        "lora_memory_gb": 6.4,
+        "total_qlora_memory_gb": 9.57625,
+        "savings_vs_fp32": 65.79910714285715,
+        "savings_vs_fp16": 31.59821428571429
+      }
+    },
+    "lora_test": {
+      "lora_params": 524288,
+      "full_params": 16777216,
+      "param_reduction": 96.875,
+      "forward_time_ms": 50.98195552825928
+    }
+  },
+  "original_implementation": {
+    "baseline_nf4": {
+      "implementation": "original",
+      "config": {
+        "description": "Baseline: 4-bit NF4 with Double Quantization",
+        "bits": 4,
+        "quant_type": "nf4",
+        "double_quant": true,
+        "lora_r": 64,
+        "lora_alpha": 16
+      },
+      "model_load_time": 173.41780304908752,
+      "trainable_params": 50462720,
+      "total_params": 666068992,
+      "trainable_percent": 7.576200154352779,
+      "gpu_memory_allocated_gb": 1.238210048,
+      "gpu_memory_reserved_gb": 1.694498816,
+      "training_time": 345.766405582428,
+      "final_loss": 1.2365298461914063,
+      "steps_per_second": 0.145
+    },
+    "comparison_fp4": {
+      "implementation": "original",
+      "config": {
+        "description": "Comparison: 4-bit FP4 with Double Quantization",
+        "bits": 4,
+        "quant_type": "fp4",
+        "double_quant": true,
+        "lora_r": 64,
+        "lora_alpha": 16
+      },
+      "model_load_time": 2.6196951866149902,
+      "trainable_params": 50462720,
+      "total_params": 666068992,
+      "trainable_percent": 7.576200154352779,
+      "gpu_memory_allocated_gb": 2.49136128,
+      "gpu_memory_reserved_gb": 2.906652672,
+      "training_time": 349.46590781211853,
+      "final_loss": 1.2441811180114746,
+      "steps_per_second": 0.143
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "model_name": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "output_dir": "./output/my_training",
+  "bits": 4,
+  "quant_type": "nf4",
+  "double_quant": true,
+  "lora_rank": 64,
+  "lora_alpha": 16,
+  "lora_dropout": 0.1,
+  "max_steps": 500,
+  "batch_size": 4,
+  "gradient_accumulation_steps": 4,
+  "learning_rate": 0.0002,
+  "weight_decay": 0.0,
+  "max_grad_norm": 0.3,
+  "warmup_steps": 50,
+  "max_samples": 5000,
+  "max_length": 512,
+  "logging_steps": 10,
+  "save_steps": 100
+}

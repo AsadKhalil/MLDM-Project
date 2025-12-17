@@ -1,0 +1,5 @@
+Experiment,Quant Type,Double Quant,LoRA Rank,Quant Error,Memory Savings
+baseline_nf4,nf4,True,64,0.073029,-2.8%
+comparison_fp4,fp4,True,64,0.073029,-2.8%
+no_double_quant,nf4,False,64,0.112494,-3.9%
+low_rank,nf4,True,16,0.073029,65.8%
